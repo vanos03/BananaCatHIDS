@@ -1,1 +1,0 @@
-schtasks /Create /XML "taskchd_rule.xml" /TN "ТЕСТ"
