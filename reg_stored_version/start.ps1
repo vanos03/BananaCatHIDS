@@ -59,20 +59,14 @@ $xmlTemplate = @"
 </Task>
 "@
 
-# Преобразуем XML и сохраняем
 [xml]$xml = $xmlTemplate
 $tmpXmlPath = "$env:TEMP\task_temp.xml"
 $xml.Save($tmpXmlPath)
 
-# Создаём задачу
 schtasks /Create /TN "BananaCat" /XML "$tmpXmlPath" /F
 
-
-
-# Удаляем временный XML
 Remove-Item $tmpXmlPath -Force
 
-# Записываем изображение в реестр
 $bytes = [System.IO.File]::ReadAllBytes($CAT_IMAGE_OUT)
 New-Item -Path $reg_path -Force | Out-Null
 Set-ItemProperty -Path $reg_path -Name "$IMAGE_NAME" -Value $bytes
