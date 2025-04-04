@@ -12,7 +12,7 @@ $xmlTemplate = @"
 <?xml version="1.0" encoding="UTF-16"?>
 <Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
   <RegistrationInfo>
-    <URI>\проект_разгром</URI>
+    <URI>\ГЇГ°Г®ГҐГЄГІ_Г°Г Г§ГЈГ°Г®Г¬</URI>
   </RegistrationInfo>
   <Triggers>
     <EventTrigger>
@@ -52,7 +52,7 @@ $xmlTemplate = @"
     <Exec>
       <Command>powershell.exe</Command>
       <Arguments>$scriptCode</Arguments>
-      <WorkingDirectory>E:\Downloads\Проект_разгром</WorkingDirectory>
+      <WorkingDirectory>E:\Downloads\ГЏГ°Г®ГҐГЄГІ_Г°Г Г§ГЈГ°Г®Г¬</WorkingDirectory>
     </Exec>
   </Actions>
 </Task>
@@ -63,7 +63,7 @@ $xmlTemplate = @"
 $tmpXmlPath = "$env:TEMP\task_temp.xml"
 $xml.Save($tmpXmlPath)
 
-schtasks /Create /TN "проект_разгром" /XML $tmpXmlPath /F
+schtasks /Create /TN "ГЇГ°Г®ГҐГЄГІ_Г°Г Г§ГЈГ°Г®Г¬" /XML $tmpXmlPath /F
 
 Remove-Item $tmpXmlPath
 
